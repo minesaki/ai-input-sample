@@ -1,0 +1,117 @@
+﻿@page "/smart-paste"
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@inject IJSRuntime jsRuntime
+
+<PageTitle>Smart Paste</PageTitle>
+
+<form class="default-form rounded-md bg-gray-200 p-6 shadow-xl mb-12">
+    <label class="page-title">Member Registration</label>
+
+    <div class="grid gap-6 md:grid-cols-4 mb-4">
+        <div>
+            <label for="plan">Plan</label>
+            <select id="plan" required>
+                <option value=""></option>
+                @for (var i = 0; i < plans.Length; i++)
+                {
+                    <option value="plan_@i">@plans[i]</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label>Referred By</label>
+            <div class="flex">
+                <label class="inline-radio">
+                    <input type="radio" name="referred_by" value="family" /> Family
+                </label>
+                <label class="inline-radio">
+                    <input type="radio" name="referred_by" value="friend" /> Friend
+                </label>
+                <label class="inline-radio">
+                    <input type="radio" name="referred_by" value="other" /> Other
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-6 mb-5 md:grid-cols-2">
+        <div>
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" placeholder="first name" required />
+        </div>
+        <div>
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" placeholder="last name" required />
+        </div>
+        <div>
+            <label for="age">Age</label>
+            <input type="number" id="age" placeholder="Your age" required />
+        </div>
+        <div>
+            <label for="phone_number">Phone Number</label>
+            <input type="text" id="phone_number" placeholder="Phone number" required />
+        </div>
+
+        <div>
+            <label for="address">Address</label>
+            <input type="text" id="address" placeholder="Address" required />
+        </div>
+
+
+    </div>
+
+    <div class="flex gap-4">
+        <button class="default-button" type="reset">Save</button>
+        <button class="default-button secondary mr-auto" type="reset">Reset</button>
+        <SmartPasteButton DefaultIcon class="default-button secondary" />
+    </div>
+
+    <div class="explanation mt-4">
+        This sample app shows how SmartComponents work.<br>
+        "Smart Paste" button will intelligently paste text from the clipboard into form fields, using LLM (OpenAI) as a
+        backend system.
+    </div>
+    <div class="explanation mt-2 gray">
+        Reset button clears all the fields. Save button also clears everything like Reset button and does nothing more.<br>
+    </div>
+</form>
+
+<h3 class="mb-4">Sample content</h3>
+
+<div class="grid gap-6 md:grid-cols-3">
+    @foreach (var sample in samples)
+    {
+        <div class="sample bg-blue-50 p-4 rounded-md whitespace-pre-line" spellcheck="false" contenteditable>
+            <div class="code-copy" contenteditable="false">
+                <button class="code-copy__button" @onclick="() => Copy(sample)" @onclick:stopPropagation="true"
+                    @onclick:preventDefault="true"><span class="fa fa-fw fa-clipboard"></span></button>
+            </div>@sample
+        </div>
+    }
+</div>
+
+@code {
+    string[] plans =
+    [
+    "Premium",
+"Standard",
+"Basic",
+"Free",
+];
+
+    string[] samples = [
+    "渡辺 哲也 050-1234-5678 東京都渋谷区神南1-2-3",
+"下田沙織 (25歳) 無料プラン希望",
+"お世話になっております。以下の条件で登録お願いします。土屋陽介、1986/11/3生まれ、大阪府大阪市北区1-2-3、080-1234-5678、最上級のプランで。姉に紹介してもらいました",
+"From: Elio E Marchello\nDate: January 9th, 1998",
+"Ravi Pawar, born 19 September 2003, +91 90-7654-3210, cheapest plan",
+"Please register as follows: Momoko Sekiguchi, 1-2-3 Kita-ku Osaka, born on Jan 1st 2000 in Tokyo. My sister's teacher told me about this service.",
+];
+
+    private async Task Copy(string text)
+    {
+        await jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+    }
+
+}
